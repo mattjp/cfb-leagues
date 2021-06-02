@@ -1,6 +1,8 @@
 # CFB Leagues
 
-+ Get list of teams
+1. Get list of teams
+  a) Done via `team_collector.py`
+
 + Create initial leagues
   + 10 leagues with 12 teams
 + For each year (1999 end-of-season to 2019 end-of-season):
