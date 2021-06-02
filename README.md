@@ -3,6 +3,7 @@
 1. Get list of teams
   
   a) Done via `team_collector.py`
+  
   b) To run `team_collector.py`, add the file `resources/secrets.json`
 
   ```json
@@ -10,6 +11,7 @@
     "api_key": "[your_api_key]"
   }
   ```
+  
   c) This should be done through a secrets manager but this is attempt number 1
 
 + Create initial leagues
