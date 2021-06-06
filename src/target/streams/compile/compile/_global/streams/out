@@ -1,0 +1,4 @@
+[0m[[0m[31merror[0m] [0m[0m/Users/mattjp/Documents/projects/cfb_league/src/sim/simulate.scala:10:10: not found: value League[0m
+[0m[[0m[31merror[0m] [0m[0m	val l = League("league 1", Seq.empty)[0m
+[0m[[0m[31merror[0m] [0m[0m	        ^[0m
+[0m[[0m[31merror[0m] [0m[0mone error found[0m
