@@ -14,6 +14,13 @@
 
     c) This should be done through a secrets manager but this is attempt number 1
 
+
+2. Create initial leagues
+
+    a) Done using rankings from starting year via `init.scala`
+
+
+
 + Create initial leagues
   + 10 leagues with 12 teams
 + For each year (1999 end-of-season to 2019 end-of-season):
