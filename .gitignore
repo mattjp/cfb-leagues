@@ -1,2 +1,10 @@
-*.html
+# secrets
 resources/secrets.json
+
+# scala
+simulate/project/project/
+simulate/project/target/
+simulate/target/
+
+# mac
+.DS_Store

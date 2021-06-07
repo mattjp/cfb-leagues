@@ -1,1 +1,0 @@
-scalac -bootclasspath /Users/mattjp/.sbt/boot/scala-2.12.10/lib/scala-library.jar -classpath /Users/mattjp/Documents/projects/cfb_league/src/sim/target/scala-2.12/classes /Users/mattjp/Documents/projects/cfb_league/src/sim/simulate.scala /Users/mattjp/Documents/projects/cfb_league/src/sim/init.scala
