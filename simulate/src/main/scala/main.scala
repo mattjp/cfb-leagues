@@ -7,7 +7,7 @@ object Main extends App {
 
 	println("Running simulation")
 
-	val l = League("league 1", Seq(Team("team 1")))
+	val l = League("league 1", 1, Seq.empty)
 	println(l)
 
 
