@@ -1,4 +1,5 @@
 {
 	"base_url": "http://api.collegefootballdata.com/",
-	"fbs_teams_endpoint": "teams/fbs"
+	"fbs_teams_endpoint": "teams/fbs",
+	"rankings_endpoint": "rankings"
 }
