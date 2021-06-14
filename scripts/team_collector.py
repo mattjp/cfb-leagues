@@ -11,8 +11,8 @@ def collect_teams(year: int = 1999) -> None:
 		config_json = json.load(config_file)
 		secrets_json = json.load(secrets_file)
 
-		url = config_json['base_url'] + config_json['fbs_teams_endpoint']
-		api_key = 'Bearer ' + secrets_json['api_key']
+		url = 'http://' + config_json['base_url'] + config_json['fbs_teams_endpoint']
+		api_key = secrets_json['api_key']
 	
 
 	headers = {'Authorization': api_key}
