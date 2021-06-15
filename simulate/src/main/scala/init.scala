@@ -23,17 +23,40 @@ object Init {
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 		val teamsJsonMap: Map[String, ujson.Value] = ujson.read(teamsJsonStr).obj.toMap
 
-		// println(teamsJsonMap)
-
 		val teams: Seq[String] = teamsJsonMap("teams")
 				.arr
 				.toSeq
 				.map(_.str)
 
-		// println(teams)
-		for (team <- teams) {
-			println(team) // first try
-		}
+		val baseUrl: String = configJsonMap("base_url").str
+		val ratingsEndpoint: String = configJsonMap("ratings_endpoint").str
+		val apiKey: String = secretsJsonMap("api_key").str
+		val headers: Map[String, String] = Map("Authorization" -> apiKey)
+
+		// Create list of Team objs
+		// Sort list based on rank
+		// for (team <- teams) {
+
+			val team = teams.head.replace(" ", "%20") // this is dumb and ugly but all the libraries i've tried don't take multiple param types
+			println(team)
+
+			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$team"
+			// val ratingsUrl = "http://api.collegefootballdata.com/ratings/sp?year=2000&team=Air%20Force"
+			println(ratingsUrl)
+
+			// val r = requests.get(ratingsUrl, headers = headers)
+			val responseJson = ujson.read(requests.get(ratingsUrl, headers = headers).text)
+			println(responseJson)
+
+			// val ratingsUrl: String = Url(
+			// 	scheme = "http",
+			// 	host = configJsonMap("base_url").str,
+			// 	path = configJsonMap("ratings_endpoint").str,
+
+			// )
+
+
+		// }
 
 		// val rankingsUrl: String = Url(
 		// 	scheme = "http", 
@@ -42,8 +65,7 @@ object Init {
 		// 	query = QueryString.fromPairs("year" -> year, "team" -> "team") // this doesn't work with different types - classic
 		// ).toString
 		
-		// val apiKey: String = secretsJsonMap("api_key").str
-		// val headers: Map[String, String] = Map("Authorization" -> apiKey)
+		
 
 		// val params = Map("year" -> 2000) // why do you not accept non-string params???
 		// val responseJson = ujson.read(requests.get(rankingsUrl, headers = headers).text)
