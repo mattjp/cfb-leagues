@@ -21,25 +21,21 @@ object Init {
 		val configJsonMap: Map[String, ujson.Value] = ujson.read(configJsonStr).obj.toMap
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 
+		// val teams = 
+
 		val rankingsUrl: String = Url(
 			scheme = "http", 
 			host = configJsonMap("base_url").str, 
-			path = configJsonMap("rankings_endpoint").str,
-			query = QueryString.fromPairs("year" -> 2000)
+			path = configJsonMap("ratings").str,
+			query = QueryString.fromPairs("year" -> year, "team" -> "team")
 		).toString
-		// val rankingsUrl: String = configJsonMap("base_url").str + configJsonMap("rankings_endpoint").str
+		
 		val apiKey: String = secretsJsonMap("api_key").str
+		val headers: Map[String, String] = Map("Authorization" -> apiKey)
 
-		println(rankingsUrl)
-		println(apiKey)
-
-
-
-
-		val headers = Map("Authorization" -> apiKey)
 		// val params = Map("year" -> 2000) // why do you not accept non-string params???
-		val response = requests.get(rankingsUrl, headers = headers)
-		println(response)
+		// val responseJson = ujson.read(requests.get(rankingsUrl, headers = headers).text)
+		// println(responseJson)
 		// val response = Http(rankingsUrl)
 				// .header("Authorization", apiKey)
 				// .param("year", 2000)

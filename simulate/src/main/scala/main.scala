@@ -8,7 +8,7 @@ object Main extends App {
 	println("Running simulation")
 
 	val l = League("league 1", 1, Seq.empty)
-	println(l)
+	// println(l)
 
 
 	// 1. run initialization of leagues and return all leagues
