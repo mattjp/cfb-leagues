@@ -8,7 +8,7 @@
 
       ```json
       {
-        "api_key": "[your_api_key]"
+        "api_key": "Bearer [your_api_key]"
       }
       ```
 
