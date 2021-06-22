@@ -21,7 +21,7 @@ def collect_teams(year: int = 2000) -> None:
 	response = requests.get(url, headers = headers, params = params).json()
 
 	# dict of one array for json dump
-	team_names = {'teams': list(map(lambda r: r['school'], response))}
+	team_names = {'teamNames': list(map(lambda r: r['school'], response))}
 
 	with open('../resources/teams.json', 'w') as teams_file:
 		json.dump(team_names, teams_file)

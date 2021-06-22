@@ -23,7 +23,7 @@ object Init {
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 		val teamsJsonMap: Map[String, ujson.Value] = ujson.read(teamsJsonStr).obj.toMap
 
-		val teams: Seq[String] = teamsJsonMap("teams")
+		val teamNames: Seq[String] = teamsJsonMap("teamNames")
 				.arr
 				.toSeq
 				.map(_.str)
@@ -37,16 +37,43 @@ object Init {
 		// Sort list based on rank
 		// for (team <- teams) {
 
-			val team = teams.head.replace(" ", "%20") // this is dumb and ugly but all the libraries i've tried don't take multiple param types
-			println(team)
+			val teamName: String = teamNames.head
 
-			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$team"
+			// this is dumb and ugly but all the libraries i've tried don't take multiple param types
+			val teamNameFormatted: String = teamNames.head.replace(" ", "%20")
+			// println(teamName)
+
+			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$teamNameFormatted"
 			// val ratingsUrl = "http://api.collegefootballdata.com/ratings/sp?year=2000&team=Air%20Force"
-			println(ratingsUrl)
+			// println(ratingsUrl)
 
-			// val r = requests.get(ratingsUrl, headers = headers)
-			val responseJson = ujson.read(requests.get(ratingsUrl, headers = headers).text)
+			
+			val responseJson: Map[String, ujson.Value] = ujson
+					.read(requests.get(ratingsUrl, headers = headers).text)
+					.arr
+					.toSeq
+					.head // ujson.Value
+					.obj
+					.toMap
+			
 			println(responseJson)
+
+			// val 
+
+			val spRating: Double = responseJson("ratingz").num // this errors if key not found
+			// val conference: String = responseJson.getOrElse("conference", "FBS Independents")
+			// println(rating)
+
+			println(spRating)
+			// println(conference)
+
+			// val team = Team(
+			// 	name = teamName,
+			// 	conference = conference,
+			// 	initialSpRating = spRating
+			// )
+
+			// println(team)
 
 			// val ratingsUrl: String = Url(
 			// 	scheme = "http",
