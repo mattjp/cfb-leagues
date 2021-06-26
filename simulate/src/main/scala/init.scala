@@ -1,11 +1,13 @@
 package sim
 
 import requests._
-import io.lemonlabs.uri.{Url, QueryString}
+// import io.lemonlabs.uri.{Url, QueryString}
 // import scalaj.http._
 import upickle.default._
 
-import types.League
+import java.net.{URLEncoder => UrlEncoder}
+
+import types.{League, Team}
 
 object Init {
 
@@ -37,15 +39,10 @@ object Init {
 		// Sort list based on rank
 		// for (team <- teams) {
 
-			val teamName: String = teamNames.head
+			val teamName: String = teamNames.head // todo -> this will be for
 
-			// this is dumb and ugly but all the libraries i've tried don't take multiple param types
-			val teamNameFormatted: String = teamNames.head.replace(" ", "%20")
-			// println(teamName)
-
-			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$teamNameFormatted"
-			// val ratingsUrl = "http://api.collegefootballdata.com/ratings/sp?year=2000&team=Air%20Force"
-			// println(ratingsUrl)
+			val teamNameEncoded: String = UrlEncoder.encode(teamName, "UTF-8")
+			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$teamNameEncoded"
 
 			
 			val responseJson: Map[String, ujson.Value] = ujson
@@ -56,24 +53,22 @@ object Init {
 					.obj
 					.toMap
 			
-			println(responseJson)
+			// println(responseJson)
 
-			// val 
 
-			val spRating: Double = responseJson("ratingz").num // this errors if key not found
-			// val conference: String = responseJson.getOrElse("conference", "FBS Independents")
-			// println(rating)
+			val spRating: Double = responseJson.getOrElse("rating", ujson.Num(1.0)).num
+			val conference: String = responseJson.getOrElse("conference", ujson.Str("FBS Independents")).str
 
 			println(spRating)
-			// println(conference)
+			println(conference)
 
-			// val team = Team(
-			// 	name = teamName,
-			// 	conference = conference,
-			// 	initialSpRating = spRating
-			// )
+			val team = Team(
+				name = teamName,
+				conference = conference,
+				initialSpRating = spRating
+			)
 
-			// println(team)
+			println(team)
 
 			// val ratingsUrl: String = Url(
 			// 	scheme = "http",
