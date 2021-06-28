@@ -1,8 +1,6 @@
 package sim
 
 import requests._
-// import io.lemonlabs.uri.{Url, QueryString}
-// import scalaj.http._
 import upickle.default._
 
 import java.net.{URLEncoder => UrlEncoder}
@@ -11,7 +9,7 @@ import types.{League, Team}
 
 object Init {
 
-	def initializeLeagues(year: Int): Seq[League] = {
+	def initializeLeagues(year: Int, leagueSize: Int): Seq[League] = {
 
 		// for each team in teams.txt
 		//   get their opening season rank for the year
@@ -25,87 +23,76 @@ object Init {
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 		val teamsJsonMap: Map[String, ujson.Value] = ujson.read(teamsJsonStr).obj.toMap
 
-		val teamNames: Seq[String] = teamsJsonMap("teamNames")
-				.arr
-				.toSeq
-				.map(_.str)
+		// val teamNames: Seq[String] = teamsJsonMap("teamNames")
+		// 		.arr
+		// 		.toSeq
+		// 		.map(_.str)
+
+		val teamNames: Seq[String] = Seq("Air Force", "Akron", "Alabama", "Arizona", "Arizona State")
 
 		val baseUrl: String = configJsonMap("base_url").str
 		val ratingsEndpoint: String = configJsonMap("ratings_endpoint").str
 		val apiKey: String = secretsJsonMap("api_key").str
 		val headers: Map[String, String] = Map("Authorization" -> apiKey)
 
-		// Create list of Team objs
-		// Sort list based on rank
-		// for (team <- teams) {
-
-			val teamName: String = teamNames.head // todo -> this will be for
+		// driving loop
+		val teams: Seq[Team] = teamNames.map { teamName =>
+			println(teamName)
 
 			val teamNameEncoded: String = UrlEncoder.encode(teamName, "UTF-8")
 			val ratingsUrl: String = s"http://$baseUrl/$ratingsEndpoint?year=$year&team=$teamNameEncoded"
 
-			
 			val responseJson: Map[String, ujson.Value] = ujson
-					.read(requests.get(ratingsUrl, headers = headers).text)
-					.arr
-					.toSeq
-					.head // ujson.Value
-					.obj
-					.toMap
+					.read(requests.get(ratingsUrl, headers = headers).text) // response - ujson.Value
+					.arr   // ujson.Arr
+					.toSeq // Seq[ujson.Value]
+					.head  // ujson.Value
+					.obj   // ujson.Obj
+					.toMap // Map[String, ujson.Value]
 			
-			// println(responseJson)
-
-
 			val spRating: Double = responseJson.getOrElse("rating", ujson.Num(1.0)).num
 			val conference: String = responseJson.getOrElse("conference", ujson.Str("FBS Independents")).str
 
-			println(spRating)
-			println(conference)
-
-			val team = Team(
+			Team(
 				name = teamName,
 				conference = conference,
-				initialSpRating = spRating
+				initialSpRating = spRating,
+				year = year
 			)
+		}
 
-			println(team)
+		println(teams)
 
-			// val ratingsUrl: String = Url(
-			// 	scheme = "http",
-			// 	host = configJsonMap("base_url").str,
-			// 	path = configJsonMap("ratings_endpoint").str,
+		val teamsSorted: Seq[Team] = teams
+				.sortBy(_.initialSpRating)
+				.reverse
 
-			// )
+		println(teamsSorted)
 
+		val teamsDivided: Seq[Seq[Team]] = splitter(teamsSorted, leagueSize)
 
-		// }
+		println(teamsDivided)
 
-		// val rankingsUrl: String = Url(
-		// 	scheme = "http", 
-		// 	host = configJsonMap("base_url").str, 
-		// 	path = configJsonMap("ratings").str,
-		// 	query = QueryString.fromPairs("year" -> year, "team" -> "team") // this doesn't work with different types - classic
-		// ).toString
-		
-		
-
-		// val params = Map("year" -> 2000) // why do you not accept non-string params???
-		// val responseJson = ujson.read(requests.get(rankingsUrl, headers = headers).text)
-		// println(responseJson)
-		// val response = Http(rankingsUrl)
-				// .header("Authorization", apiKey)
-				// .param("year", 2000)
-
-		// println(jsonMap("base_url"))
-		// println(jsonData.value)
-		
-
-
-
-
-		Seq.empty
-
+		teamsDivided.zipWithIndex.map { case(ts, i) => 
+			League(
+				name = s"League $i", // todo -> read in from names list?
+				rank = i,
+				teams = ts
+			)
+		}
 	}
+
+
+	/**
+	 * Take an array and divide it into sub-arrays of defined length.
+	 * Return an array containing the sub-arrays.
+	 */ 
+	def splitter[A](as: Seq[A], l: Int): Seq[Seq[A]] = 
+		if (as.length < l * 2) Seq(as)
+		else {
+			val (h, t) = as.splitAt(l)
+			Seq(h) ++ splitter(t, l)
+		}
 
 }
 

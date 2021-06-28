@@ -12,7 +12,7 @@ object Main extends App {
 
 
 	// 1. run initialization of leagues and return all leagues
-	val leagues: Seq[League] = Init.initializeLeagues(2000)
+	val leagues: Seq[League] = Init.initializeLeagues(2000, 10)
 
 
 
