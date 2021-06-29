@@ -1,20 +1,17 @@
 package sim
 
+import java.net.{URLEncoder => UrlEncoder}
 import requests._
 import upickle.default._
-
-import java.net.{URLEncoder => UrlEncoder}
 
 import types.{League, Team}
 
 object Init {
 
+	/**
+	 * this function does something
+	 */
 	def initializeLeagues(year: Int, leagueSize: Int): Seq[League] = {
-
-		// for each team in teams.txt
-		//   get their opening season rank for the year
-		// subdivide all teams into leagues of 12 teams each
-
 		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString
 		val secretsJsonStr: String = scala.io.Source.fromFile("../resources/secrets.json").mkString
 		val teamsJsonStr: String = scala.io.Source.fromFile("../resources/teams.json").mkString
@@ -23,6 +20,11 @@ object Init {
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 		val teamsJsonMap: Map[String, ujson.Value] = ujson.read(teamsJsonStr).obj.toMap
 
+		val baseUrl: String = configJsonMap("base_url").str
+		val ratingsEndpoint: String = configJsonMap("ratings_endpoint").str
+		val apiKey: String = secretsJsonMap("api_key").str
+		val headers: Map[String, String] = Map("Authorization" -> apiKey)
+
 		// val teamNames: Seq[String] = teamsJsonMap("teamNames")
 		// 		.arr
 		// 		.toSeq
@@ -30,12 +32,6 @@ object Init {
 
 		val teamNames: Seq[String] = Seq("Air Force", "Akron", "Alabama", "Arizona", "Arizona State")
 
-		val baseUrl: String = configJsonMap("base_url").str
-		val ratingsEndpoint: String = configJsonMap("ratings_endpoint").str
-		val apiKey: String = secretsJsonMap("api_key").str
-		val headers: Map[String, String] = Map("Authorization" -> apiKey)
-
-		// driving loop
 		val teams: Seq[Team] = teamNames.map { teamName =>
 			println(teamName)
 
@@ -61,17 +57,11 @@ object Init {
 			)
 		}
 
-		println(teams)
-
 		val teamsSorted: Seq[Team] = teams
 				.sortBy(_.initialSpRating)
 				.reverse
 
-		println(teamsSorted)
-
 		val teamsDivided: Seq[Seq[Team]] = splitter(teamsSorted, leagueSize)
-
-		println(teamsDivided)
 
 		teamsDivided.zipWithIndex.map { case(ts, i) => 
 			League(
@@ -95,4 +85,3 @@ object Init {
 		}
 
 }
-
