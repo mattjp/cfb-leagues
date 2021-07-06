@@ -9,4 +9,8 @@ case class Team(
 	wins: Int = 0,
 	loses: Int = 0,
 	ties: Int = 0
-)
+) {
+
+	implicit val teamId: String = s"${this.year}-${this.name}"
+
+}
