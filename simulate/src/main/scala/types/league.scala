@@ -1,7 +1,7 @@
 package types
 
 case class League(
+	id: Int,
 	name: String,
-	rank: Int,
 	teams: Seq[Team]
 )

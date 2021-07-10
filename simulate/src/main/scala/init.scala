@@ -9,7 +9,10 @@ import types.{League, Team}
 object Init {
 
 	/**
-	 * this function does something
+	 * Get all FBS teams for the given year.
+	 * Sort all teams based on SP rating.
+	 * Divide all teams into leagues of given size.
+	 * Return a list of leagues.
 	 */
 	def initializeLeagues(year: Int, leagueSize: Int): Seq[League] = {
 		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString
@@ -60,14 +63,16 @@ object Init {
 		val teamsSorted: Seq[Team] = teams
 				.sortBy(_.initialSpRating)
 				.reverse
+				.zipWithIndex
+				.map { case(t, i) => t.copy(rank = Some(i)) } // Add initial rankings
 
 		val teamsDivided: Seq[Seq[Team]] = splitter(teamsSorted, leagueSize)
 
 		teamsDivided.zipWithIndex.map { case(ts, i) => 
 			League(
+				id = i,
 				name = s"League $i", // todo -> read in from names list?
-				rank = i,
-				teams = ts
+				teams = ts.map { _.copy(leagueId = Some(i)) } // Set leagueId for each team in the league
 			)
 		}
 	}

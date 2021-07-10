@@ -9,15 +9,17 @@ case class Db(tableName: String) {
 	implicit val table: Table = dynamoDB.table(tableName).get
 
 	def getTeams(
-		teamId: Option[String] = None, 
+		teamId: Option[String] = None,
+		leagueId: Option[Int] = None,
 		teamName: Option[String] = None, 
 		year: Option[Int] = None
 	): Seq[Team] = {
 
 		val filters = Map(
-			"teamId" -> teamId,
-			"name"   -> teamName,
-			"year"   -> year
+			"teamId"   -> teamId,
+			"leagueId" -> leagueId,
+			"name"     -> teamName,
+			"year"     -> year
 		)
 
 		val filter = filters.collect { case (k, Some(v)) => k -> cond.eq(v) }.toSeq
@@ -35,22 +37,26 @@ case class Db(tableName: String) {
 			for {
 				name            <- attributes.get("name")
 				conference      <- attributes.get("conference")
+				leagueId        =  attributes.get("leagueId") // Option
 				initialSpRating <- attributes.get("initialSpRating")
 				year            <- attributes.get("year")
 				rank            =  attributes.get("rank") // Option
 				wins            <- attributes.get("wins")
 				loses           <- attributes.get("loses")
 				ties            <- attributes.get("ties")
+				points          <- attributes.get("points")
 			} yield {
 				Team(
 					name            = name.getS,
 					conference      = conference.getS,
+					leagueId        = leagueId.map(_.getN.toInt),
 					initialSpRating = initialSpRating.getN.toDouble,
 					year            = year.getN.toInt,
 					rank            = rank.map(_.getN.toInt),
 					wins            = wins.getN.toInt,
 					loses           = loses.getN.toInt,
-					ties            = ties.getN.toInt
+					ties            = ties.getN.toInt,
+					points          = points.getN.toInt
 				)
 			}
 		}
@@ -58,7 +64,11 @@ case class Db(tableName: String) {
 	}
 
 	def writeTeam(team: Team) = {
-		table.putItem(team.teamId, team.year, team)
+		table.put(team.teamId, team.year, team.unpack: _*) // This does not write nulls
+	}
+
+	def writeTeams(teams: Seq[Team]) = {
+		teams.foreach { team => writeTeam(team) }
 	}
 
 	def deleteTeam(teamId: String) = {

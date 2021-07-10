@@ -15,4 +15,17 @@ case class Team(
 
 	implicit val teamId: String = s"${this.year}-${this.name}"
 
+	implicit val unpack = Seq(
+		"name"            -> this.name,
+		"conference"      -> this.conference,
+		"leagueId"        -> this.leagueId.getOrElse(null),
+		"initialSpRating" -> this.initialSpRating,
+		"year"            -> this.year,
+		"rank"            -> this.rank.getOrElse(null),
+		"wins"            -> this.wins,
+		"loses"           -> this.loses,
+		"ties"            -> this.ties,
+		"points"          -> this.points
+	) 
+
 }
