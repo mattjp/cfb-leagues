@@ -14,6 +14,8 @@ object Main extends App {
 	// 1. run initialization of leagues and return all leagues
 	// val leagues: Seq[League] = Init.initializeLeagues(2000, 10)
 
+	// 2. write all 
+
 	val db = Db("teams")
 	// db.init()
 
@@ -27,7 +29,13 @@ object Main extends App {
 	// db.writeTeam(t)
 	// Thread.sleep(5000)
 
-	db.getTeams(teamId = "2000-University of Example")
+	val res = db.getTeams(teamId = Some("2000-University of Example"), year = Some(2000))
+	println(res)
+
+
+	// db.getTeams(teamName = Some("University of Example"))
+
+	// db.getTeams(year = Some(2000))
 
 	// db.deleteTeam(t)
 
