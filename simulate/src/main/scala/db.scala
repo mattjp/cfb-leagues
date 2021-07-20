@@ -12,7 +12,8 @@ case class Db(tableName: String) {
 		teamId: Option[String] = None,
 		leagueId: Option[Int] = None,
 		teamName: Option[String] = None, 
-		year: Option[Int] = None
+		year: Option[Int] = None,
+		limit: Int = 50
 	): Seq[Team] = {
 
 		val filters = Map(
@@ -23,7 +24,7 @@ case class Db(tableName: String) {
 		)
 
 		val filter = filters.collect { case (k, Some(v)) => k -> cond.eq(v) }.toSeq
-		val items: Seq[Item] = table.scan(filter = filter)
+		val items: Seq[Item] = table.scan(filter = filter, limit = limit)
 
 		// Flatten out missing Items
 		items.flatMap { item =>
@@ -63,13 +64,16 @@ case class Db(tableName: String) {
 
 	}
 
+
 	def writeTeam(team: Team) = {
 		table.put(team.teamId, team.year, team.unpack: _*) // This does not write nulls
 	}
 
+
 	def writeTeams(teams: Seq[Team]) = {
 		teams.foreach { team => writeTeam(team) }
 	}
+
 
 	def deleteTeam(teamId: String) = {
 		table.deleteItem(teamId)
