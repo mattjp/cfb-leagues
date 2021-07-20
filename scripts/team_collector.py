@@ -2,7 +2,7 @@ import json
 import requests
 import urllib
 
-def collect_teams(year: int = 2000) -> None:
+def collect_teams(year: int = 2005) -> None:
 	"""
 	Writes a newline delimited list of FBS teams to resources/teams.txt
 	TODO: add wrapper for selecting different year

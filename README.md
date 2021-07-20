@@ -24,6 +24,7 @@
 + Create initial leagues
   + 10 leagues with 12 teams
 + For each year (1999 end-of-season to 2019 end-of-season):
+  + 2005 is earliest year
   + For each team:
     + For each game:
         + Update point total based on opponent and outcome

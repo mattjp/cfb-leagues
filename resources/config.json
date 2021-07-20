@@ -1,6 +1,8 @@
 {
 	"base_url": "api.collegefootballdata.com",
+	"calendar_endpoint": "calendar",
 	"fbs_teams_endpoint": "teams/fbs",
+	"games_endpoint": "games/teams",
 	"rankings_endpoint": "rankings",
 	"ratings_endpoint": "ratings/sp"
 }
