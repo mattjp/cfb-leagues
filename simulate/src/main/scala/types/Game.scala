@@ -1,8 +1,7 @@
 package types
 
 case class Game(
-	// gameId: Int,
-	homeTeamId: Option[String]    = None, // this is never None?
+	homeTeamId: Option[String]    = None,
 	awayTeamId: Option[String]    = None,
 	homeTeamLeagueId: Option[Int] = None,
 	awayTeamLeagueId: Option[Int] = None,

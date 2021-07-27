@@ -33,9 +33,8 @@ object Simulate {
 			.length
 	}
 
-	// def simulateRegularSeason() = ()
 
-	def getGame(teamName: String, year: Int, week: Int): Game = { // take Team not teamName
+	def getGame(teamName: String, year: Int, week: Int): Game = { // take Team/teamId not teamName
 
 		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString // TODO -> this is all duplicate
 		val secretsJsonStr: String = scala.io.Source.fromFile("../resources/secrets.json").mkString
@@ -105,6 +104,19 @@ object Simulate {
 			homeTeamPoints = homeTeam.get("points").map(_.num.toInt),
 			awayTeamPoints = awayTeam.get("points").map(_.num.toInt)
 		)
+	}
+
+
+	// Signature could also be teamId, gameId (that probably makes more sense, but I don't wanna set up the DB rn)
+	def getPoints(teamId: String, game: Game): Int = {
+
+		Some(teamId) match {
+			case game.homeTeamId => 1
+			case game.awayTeamId => 2
+			case _               => 0 
+		}
+
+
 	}
 
 }
