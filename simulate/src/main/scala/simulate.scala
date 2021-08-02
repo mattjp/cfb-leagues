@@ -109,14 +109,111 @@ object Simulate {
 
 	// Signature could also be teamId, gameId (that probably makes more sense, but I don't wanna set up the DB rn)
 	def getPoints(teamId: String, game: Game): Int = {
+		val hPoints = game.homeTeamPoints.getOrElse(0)
+		val aPoints = game.awayTeamPoints.getOrElse(0)
+		val pointMargin = (hPoints - aPoints).abs
 
 		Some(teamId) match {
-			case game.homeTeamId => 1
-			case game.awayTeamId => 2
-			case _               => 0 
+
+			// returning score for home team
+			case game.homeTeamId => {
+
+				// win @ home
+				if (hPoints > aPoints) {
+
+					scoreGame(
+						game          = game,
+						pointMargin   = pointMargin,
+						scoreFcs      = (p: Int) => if (p > 14) 0 else -1,
+						scoreInferior = (p: Int) => if (p > 21) 3 else  2,
+						scoreEqual    = (p: Int) => if (p > 14) 4 else  3,
+						scoreSuperior = (p: Int) => if (p > 14) 5 else  4
+					)
+
+				// loss @ home
+				} else {
+
+					scoreGame(
+						game          = game,
+						pointMargin   = pointMargin,
+						scoreFcs      = (pm: Int) => if (pm > 14) -6 else -4,
+						scoreInferior = (pm: Int) => if (pm > 14) -3 else -2,
+						scoreEqual    = (pm: Int) => 0,
+						scoreSuperior = (pm: Int) => if (pm > 14)  0 else  1
+					)
+
+				}
+
+			}
+
+			// returning score for away team
+			case game.awayTeamId => {
+
+				// win @ away
+				if (aPoints > hPoints) {
+
+					scoreGame(
+						game          = game,
+						pointMargin   = pointMargin,
+						scoreFcs      = (pm: Int) => if (pm > 14) 0 else -1,
+						scoreInferior = (pm: Int) => if (pm > 21) 3 else  2,
+						scoreEqual    = (pm: Int) => if (pm > 14) 5 else  4,
+						scoreSuperior = (pm: Int) => if (pm > 14) 7 else  6
+					)
+
+				// loss @ away
+				} else {
+
+					scoreGame(
+						game          = game,
+						pointMargin   = pointMargin,
+						scoreFcs      = (p: Int) => if (p > 14) -4 else -2,
+						scoreInferior = (p: Int) => if (p > 14) -2 else -1,
+						scoreEqual    = (p: Int) => if (p > 14)  0 else  1,
+						scoreSuperior = (p: Int) => if (p > 14)  1 else  2
+					)
+
+				}
+
+			}
+
+			// this should never happen
+			case _ => 0 
 		}
+	}
 
+	/**
+	 * Return score for game based on league
+	 */ 
+	def scoreGame(
+		game: Game, 
+		pointMargin: Int,
+		scoreFcs: Int => Int,
+		scoreInferior: Int => Int, 
+		scoreEqual: Int => Int, 
+		scoreSuperior: Int => Int
+	) = {
+		(game.homeTeamLeagueId, game.awayTeamLeagueId) match {
 
+			// both teams are FBS
+			case (Some(homeLeague), Some(awayLeague)) => {
+
+				// opponent is in inferior league
+				if (homeLeague < awayLeague) scoreInferior(pointMargin)
+
+				// opponent is in same league
+				else if (homeLeague == awayLeague) scoreEqual(pointMargin)
+
+				// opponent is in superior league
+				else scoreSuperior(pointMargin)
+			}
+
+			// opponent is FCS
+			case (Some(hLeague), None) => scoreFcs(pointMargin)
+
+			// this should never happen
+			case _ => 0 
+		}
 	}
 
 }

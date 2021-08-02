@@ -38,4 +38,7 @@ object Main extends App {
 	val g = Simulate.getGame("Alabama", 2005, 1)
 	println(g)
 
+	val p = Simulate.getPoints("2005-Alabama", g)
+	println(p)
+
 }
