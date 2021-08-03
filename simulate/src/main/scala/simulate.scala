@@ -50,9 +50,9 @@ object Simulate {
 		val gamesUrl: String = s"http://$baseUrl/$gamesEndpoint?year=$year&week=$week&team=$teamName"
 
 		val response = ujson
-			.read(requests.get(gamesUrl, headers = headers).text)
+			.read(requests.get(gamesUrl, headers = headers).text) // this can be empty if bye week
 			.arr
-			.toSeq // this can be empty if no game that week
+			.toSeq // this can be empty if no game that week, probably needs to return Option[Game]
 			.head
 			.obj
 			.toMap
@@ -143,7 +143,6 @@ object Simulate {
 					)
 
 				}
-
 			}
 
 			// returning score for away team
@@ -174,10 +173,9 @@ object Simulate {
 					)
 
 				}
-
 			}
 
-			// this should never happen
+			// this should never happen unless it's a tie
 			case _ => 0 
 		}
 	}

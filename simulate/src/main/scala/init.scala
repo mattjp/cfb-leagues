@@ -33,6 +33,7 @@ object Init {
 		// 		.toSeq
 		// 		.map(_.str)
 
+		// used for testing
 		val teamNames: Seq[String] = Seq("Air Force", "Akron", "Alabama", "Arizona", "Arizona State")
 
 		val teams: Seq[Team] = teamNames.map { teamName =>
