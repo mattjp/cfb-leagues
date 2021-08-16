@@ -13,7 +13,7 @@ case class Db(tableName: String) {
 		leagueId: Option[Int] = None,
 		teamName: Option[String] = None, 
 		year: Option[Int] = None,
-		limit: Int = 50
+		limit: Int = 200
 	): Seq[Team] = {
 
 		val filters = Map(

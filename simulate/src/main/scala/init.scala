@@ -14,7 +14,7 @@ object Init {
 	 * Divide all teams into leagues of given size.
 	 * Return a list of leagues.
 	 */
-	def initializeLeagues(year: Int, leagueSize: Int): Seq[League] = {
+	def initializeLeaguesFromApi(year: Int, leagueSize: Int): Seq[League] = {
 		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString
 		val secretsJsonStr: String = scala.io.Source.fromFile("../resources/secrets.json").mkString
 		val teamsJsonStr: String = scala.io.Source.fromFile("../resources/teams.json").mkString
@@ -28,13 +28,13 @@ object Init {
 		val apiKey: String = secretsJsonMap("api_key").str
 		val headers: Map[String, String] = Map("Authorization" -> apiKey)
 
-		// val teamNames: Seq[String] = teamsJsonMap("teamNames")
-		// 		.arr
-		// 		.toSeq
-		// 		.map(_.str)
+		val teamNames: Seq[String] = teamsJsonMap("teamNames")
+				.arr
+				.toSeq
+				.map(_.str)
 
 		// used for testing
-		val teamNames: Seq[String] = Seq("Air Force", "Akron", "Alabama", "Arizona", "Arizona State")
+		// val teamNames: Seq[String] = Seq("Air Force", "Akron", "Alabama", "Arizona", "Arizona State")
 
 		val teams: Seq[Team] = teamNames.map { teamName =>
 			println(teamName)
@@ -76,6 +76,35 @@ object Init {
 				teams = ts.map { _.copy(leagueId = Some(i)) } // Set leagueId for each team in the league
 			)
 		}
+	}
+
+
+	/**
+	 * Get teams from database.
+	 */ 
+	def initializeLeaguesFromDb(year: Int, leagueSize: Int): Seq[League] = {
+
+		val db: Db = Db("teams")
+
+		val leagueIds: Seq[Int] = (0 to leagueSize).toSeq
+
+		leagueIds.foldLeft((Seq[League]())) { (l, leagueId) =>
+
+			val teams: Seq[Team] = db.getTeams(
+				year = Some(year),
+				leagueId = Some(leagueId)
+			)
+
+			if (teams.isEmpty) l
+			else {
+				l :+ League(
+					id = leagueId, 
+					name = s"League $leagueId",
+					teams = teams
+				)
+			}
+		}
+
 	}
 
 
