@@ -74,6 +74,10 @@ case class Db(tableName: String) {
 		teams.foreach { team => writeTeam(team) }
 	}
 
+	def writeLeagues(leagues: Seq[League]) = {
+		leagues.foreach { league => db.writeTeams(league.teams) }
+	}
+
 
 	def deleteTeam(teamId: String) = {
 		table.deleteItem(teamId)

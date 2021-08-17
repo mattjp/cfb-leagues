@@ -225,7 +225,53 @@ object Simulate {
 	}
 
 
-	// def simulateSeason()
+	/**
+	 * Simulate 1 season for all teams in all leagues
+	 */
+	def simulateSeason(leagues: Seq[League], year: Int): Seq[League] = {
+		val maxWeek: Int = getWeeks(year)
+		val weeks: Seq[Int] = (1 to maxWeek).toSeq
+
+		leagues.map { league => 
+
+			println(s"Simulating league '${league.name}' for year $year")
+
+			val updatedTeams: Seq[Team] = league.teams.map { team => 
+
+				// for each week
+				weeks.foldLeft((team)) { (t, week) =>
+
+					// get game
+					val gameOpt: Option[Game] = getGame(
+						teamName = t.name, 
+						year     = year, 
+						week     = week
+					)
+
+					println(gameOpt)
+
+					gameOpt match {
+						case None => t
+						case Some(game) => {
+							// get points for game
+							// TODO -> this should return win/loss/draw as well
+							val points: Int = getPoints(
+								teamId = t.teamId, 
+								game   = game
+							)
+
+							println(points)
+
+							// update team points
+							t.copy(points = t.points + points)	
+						}
+					}
+				}
+			}
+
+			league.copy(teams = updatedTeams)
+		}
+	}
 
 	/**
 	 * For each league, relegate the bottom 3 teams to the league below. 
@@ -246,7 +292,7 @@ object Simulate {
 				.map { _.teams.sortBy(_.points).reverse.take(n) }
 
 			val league: League = leagues(i)
-			val teamsSorted: Seq[Team] = league.teams.sortBy(_.points).reverse
+			val teamsSorted: Seq[Team] = league.teams.sortBy(_.points).reverse // update sortBy to account for total points
 
 			// replace top 3 teams with bottom 3 teams from L-1 (if it exists), write to L'
 			val updatedTeamsSorted: Seq[Team] = 
