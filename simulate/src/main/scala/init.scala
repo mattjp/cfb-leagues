@@ -88,12 +88,12 @@ object Init {
 
 		val leagueIds: Seq[Int] = (0 to leagueSize).toSeq
 
-		leagueIds.foldLeft((Seq[League]())) { (l, leagueId) =>
+		val x = leagueIds.foldLeft((Seq[League]())) { (l, leagueId) =>
 
 			val teams: Seq[Team] = db.getTeams(
 				year = Some(year),
 				leagueId = Some(leagueId)
-			)
+			).toList // trying to not use LazyList to see if performance improves
 
 			if (teams.isEmpty) l
 			else {
@@ -105,6 +105,8 @@ object Init {
 			}
 		}
 
+		// x.take(4).toList
+		x
 	}
 
 

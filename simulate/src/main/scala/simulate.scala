@@ -226,7 +226,7 @@ object Simulate {
 
 
 	/**
-	 * Simulate 1 season for all teams in all leagues
+	 * Simulate one (1) season for all teams in all leagues
 	 */
 	def simulateSeason(leagues: Seq[League], year: Int): Seq[League] = {
 		val maxWeek: Int = getWeeks(year)
@@ -274,6 +274,15 @@ object Simulate {
 	}
 
 	/**
+	 * Update the year for each team in each league.
+	 */
+	def updateYear(leagues: Seq[League], newYear: Int): Seq[League] = {
+		leagues.map { league =>
+			league.copy(teams = league.teams.map { _.copy(year = newYear) })
+		}
+	}
+
+	/**
 	 * For each league, relegate the bottom 3 teams to the league below. 
 	 * Additionally, promote the top 3 teams to the league above.
 	 * Return the new leagues.
@@ -307,6 +316,45 @@ object Simulate {
 			ls :+ league.copy(teams = newTeams)
 		}
 
+	}
+
+
+	/**
+	 * Sort teams in each league by the amount of points they earned last season.
+	 * Update each teams rank as well as their leagueId. 
+	 */
+	def sortAndRankLeagues(leagues: Seq[League], leagueSize: Int): Seq[League] = {
+
+		// sort teams in each league
+		val sortedLeagues = leagues.map { league => 
+			league.copy(teams = league.teams.sortBy(_.points).reverse)
+		}
+
+		// copy each team with updated rank and leagueId
+		sortedLeagues
+			.zipWithIndex
+			.map { case (league, leagueId) => 
+				league.copy(teams = league
+					.teams
+					.zipWithIndex
+					.map { case (team, teamRank) => 
+						team.copy(
+							rank = Some(teamRank + (leagueId * leagueSize)),
+							leagueId = Some(leagueId)
+						)
+					}
+				)
+			}
+	}
+
+
+	/**
+	 * Set points equal to 0 for all teams in all leagues
+	 */
+	def resetPoints(leagues: Seq[League]): Seq[League] = {
+		leagues.map { league =>
+			league.copy(teams = league.teams.map { _.copy(points = 0) })
+		}
 	}
 
 }
