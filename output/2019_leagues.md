@@ -13,9 +13,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Penn State `(25)`
 5. Michigan `(23)`
 6. Alabama `(23)`
-7. LSU+ `(37)`
-8. Utah+ `(30)`
-9. Wisconsin+ `(29)`
+7. LSU<sup>+</sup> `(37)`
+8. Utah<sup>+</sup> `(30)`
+9. Wisconsin<sup>+</sup> `(29)`
 
 ## League 1
 
