@@ -26,9 +26,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Auburn `(22)`
 5. USC `(22)`
 6. Texas `(17)`
-7. Oregon+ `(45)`
-8. Iowa+ `(30)`
-9. Florida+ `(25)`
+7. Oregon<sup>+</sup> `(45)`
+8. Iowa<sup>+</sup> `(30)`
+9. Florida<sup>+</sup> `(25)`
 
 ## League 2
 
@@ -39,9 +39,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Oklahoma State `(17)`
 5. Arizona State `(17)`
 6. Texas A&M `(15)`
-7. Baylor+ `(38)`
-8. Kansas State+ `(38)`
-9. California+ `(32)`
+7. Baylor<sup>+</sup> `(38)`
+8. Kansas State<sup>+</sup> `(38)`
+9. California<sup>+</sup> `(32)`
 
 ## League 3
 
@@ -52,9 +52,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. UCLA `(39)`
 5. Mississippi State `(13)`
 6. Miami `(11)`
-7. Iowa State+ `(32)`
-8. Texas Tech+ `(21)`
-9. San Diego State+ `(16)`
+7. Iowa State<sup>+</sup> `(32)`
+8. Texas Tech<sup>+</sup> `(21)`
+9. San Diego State<sup>+</sup> `(16)`
 
 ## League 4
 
@@ -65,9 +65,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Virginia Tech `(13)`
 5. Missouri `(12)`
 6. Nebraska `(10)`
-7. Cincinnati+ `(32)`
-8. Tennessee+ `(21)`
-9. Temple+ `(18)`
+7. Cincinnati<sup>+</sup> `(32)`
+8. Tennessee<sup>+</sup> `(21)`
+9. Temple<sup>+</sup> `(18)`
 
 ## League 5
 
@@ -78,9 +78,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Pittsburgh `(18)`
 5. Maryland `(7)`
 6. South Florida `(5)`
-7. Virginia+ `(32)`
-8. Kentucky+ `(27)`
-9. North Carolina+ `(25)`
+7. Virginia<sup>+</sup> `(32)`
+8. Kentucky<sup>+</sup> `(27)`
+9. North Carolina<sup>+</sup> `(25)`
 
 ## League 6
 
@@ -91,9 +91,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Duke `(21)`
 5. Ole Miss `(17)`
 6. Purdue `(16)`
-7. Memphis+ `(42)`
-8. Indiana+ `(37)`
-9. Navy+ `(34)`
+7. Memphis<sup>+</sup> `(42)`
+8. Indiana<sup>+</sup> `(37)`
+9. Navy<sup>+</sup> `(34)`
 
 ## League 7
 
@@ -104,9 +104,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Oregon State `(29)`
 5. Utah State `(22)`
 6. Western Michigan `(17)`
-7. SMU+ `(44)`
-8. Air Force+ `(41)`
-9. Hawai'i+ `(33)`
+7. SMU<sup>+</sup> `(44)`
+8. Air Force<sup>+</sup> `(41)`
+9. Hawai'i<sup>+</sup> `(33)`
 
 ## League 8
 
@@ -117,9 +117,9 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. Tulane `(25)`
 5. Central Michigan `(23)`
 6. Colorado State `(18)`
-7. Illinois+ `(34)`
-8. Miami (OH)+ `(29)`
-9. Ohio+ `(18)`
+7. Illinois<sup>+</sup> `(34)`
+8. Miami (OH)<sup>+</sup> `(29)`
+9. Ohio<sup>+</sup> `(18)`
 
 ## League 9
 
@@ -130,13 +130,13 @@ Shown in parentheses are each teams point total from the 2019 season. Promoted t
 4. UNLV `(18)`
 5. UAB `(9)`
 6. New Mexico `(7)`
-7. Kent State+ `(31)`
-8. Ball State+ `(29)`
-9. San José State+ `(29)`
+7. Kent State<sup>+</sup> `(31)`
+8. Ball State<sup>+</sup> `(29)`
+9. San José State<sup>+</sup> `(29)`
 
 ## League 10
 
-0. Connecticut- `(6)`
+0. Connecticut<sup>\-</sup> `(6)`
 1. North Texas- `(1)`
 2. Akron- `(-7)`
 3. Louisiana Tech `(27)`
