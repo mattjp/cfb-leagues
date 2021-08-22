@@ -10,30 +10,6 @@ object Simulate {
 
 	val db: Db = Db("teams")
 
-	def getWeeks(year: Int): Int = {
-
-		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString // TODO -> this is all duplicate
-		val secretsJsonStr: String = scala.io.Source.fromFile("../resources/secrets.json").mkString
-
-		val configJsonMap: Map[String, ujson.Value] = ujson.read(configJsonStr).obj.toMap // TODO -> duplicate
-		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
-
-		val baseUrl: String = configJsonMap("base_url").str // TODO -> duplicate
-		val calendarEndpoint: String = configJsonMap("calendar_endpoint").str
-		val apiKey: String = secretsJsonMap("api_key").str
-		val headers: Map[String, String] = Map("Authorization" -> apiKey)
-
-		val calendarUrl: String = s"http://$baseUrl/$calendarEndpoint?year=$year"
-
-		ujson
-			.read(requests.get(calendarUrl, headers = headers).text)
-			.arr
-			.toSeq
-			.filter { _.obj.toMap.get("seasonType") == Some(ujson.Str("regular")) } // Postseason?
-			.length
-	}
-
-
 	/**
 	 * TODO - take Team/teamId not teamName
 	 */
@@ -216,9 +192,6 @@ object Simulate {
 	 * Simulate one (1) season for all teams in all leagues
 	 */
 	def simulateSeason(leagues: Seq[League], year: Int): Seq[League] = {
-		val maxWeek: Int = getWeeks(year)
-		val weeks: Seq[Int] = (1 to maxWeek).toSeq
-
 		leagues.map { league => 
 			println(s"=> Simulating league '${league.name}' for year $year")
 
@@ -238,7 +211,7 @@ object Simulate {
 						game   = game
 					)
 
-					println(s"=> ${game.awayTeamId.getOrElse("None")} @ ${game.homeTeamId.getOrElse("None")} :: $p")
+					println(s"=> ${game.awayTeamId.getOrElse("None")} (${game.awayTeamPoints.getOrElse("")}) @ ${game.homeTeamId.getOrElse("None")} (${game.homeTeamPoints.getOrElse("")}) :: $p")
 					points + p
 				}
 

@@ -5,8 +5,8 @@ import types.{Game, League, Team}
 
 object Main extends App {
 
-	val startYear = 2007 // update how this is set
-	val endYear = 2019 // update how this is set
+	val startYear: Int = 2010 // update how this is set
+	val endYear: Int = 2019 // update how this is set
 	val leagueSize = 10
 	val n = 3
 
@@ -22,7 +22,7 @@ object Main extends App {
 	(startYear to endYear).toSeq.foreach { year =>
 		println(s"Running simulation for $year...")
 
-		val leagues: Seq[League] = Init.initializeLeaguesFromDb(startYear, leagueSize)
+		val leagues: Seq[League] = Init.initializeLeaguesFromDb(year, leagueSize)
 		// println(leagues)
 
 		val leaguesSimulated: Seq[League] = Simulate.simulateSeason(leagues, year)	
