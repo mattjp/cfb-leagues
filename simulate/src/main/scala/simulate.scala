@@ -34,7 +34,10 @@ object Simulate {
 	}
 
 
-	def getGame(teamName: String, year: Int, week: Int): Option[Game] = { // take Team/teamId not teamName
+	/**
+	 * TODO - take Team/teamId not teamName
+	 */
+	def getGames(teamName: String, year: Int): Seq[Game] = {
 
 		val configJsonStr: String = scala.io.Source.fromFile("../resources/config.json").mkString // TODO -> this is all duplicate
 		val secretsJsonStr: String = scala.io.Source.fromFile("../resources/secrets.json").mkString
@@ -42,73 +45,67 @@ object Simulate {
 		val configJsonMap: Map[String, ujson.Value] = ujson.read(configJsonStr).obj.toMap // TODO -> duplicate
 		val secretsJsonMap: Map[String, ujson.Value] = ujson.read(secretsJsonStr).obj.toMap
 
-		val baseUrl: String = configJsonMap("base_url").str // TODO -> duplicate
+		val baseUrl: String = configJsonMap("base_url").str // TODO -> duplicate from init and getWeeks
 		val gamesEndpoint: String = configJsonMap("games_endpoint").str
 		val apiKey: String = secretsJsonMap("api_key").str
 		val headers: Map[String, String] = Map("Authorization" -> apiKey)
 		
 		val teamNameEncoded: String = UrlEncoder.encode(teamName, "UTF-8")
-		val gamesUrl: String = s"http://$baseUrl/$gamesEndpoint?year=$year&week=$week&team=$teamNameEncoded"
+		val gamesUrl: String = s"http://$baseUrl/$gamesEndpoint?year=$year&team=$teamNameEncoded"
 
-		val responseSeq = ujson
-			.read(requests.get(gamesUrl, headers = headers).text) // this can be empty if bye week
+		val responses = ujson
+			.read(requests.get(gamesUrl, headers = headers).text)
 			.arr
-			.toSeq // this can be empty if no game that week, probably needs to return Option[Game]
+			.toSeq
 
-		if (responseSeq.isEmpty) return None
-			
-		val response = responseSeq
-			.head
-			.obj
-			.toMap
-
-		val teams: Option[Seq[Map[String, ujson.Value]]] = response
-			.get("teams")
-			.map { teams =>
-				teams
-					.arr
-					.toSeq
-					.map { team =>
-						team
-							.obj
-							.toMap
-							.filterKeys { key => 
-								Set("homeAway", "school", "points").contains(key) 
+		val allTeams: Seq[Seq[Map[String, ujson.Value]]] = responses
+			.flatMap { response =>
+				response
+					.obj
+					.toMap
+					.get("teams")
+					.map { teams =>
+						teams
+							.arr
+							.toSeq
+							.map { team =>
+								team
+									.obj
+									.toMap
+									.filterKeys { key => 
+										Set("homeAway", "school", "points").contains(key) 
+									}
 							}
 					}
 			}
 
-		// turn teams into home/away maps
+		// reduce number of DB calls 
+		val cache: Cache = Cache(db, year)
+		val leagueIdCache: Map[String, Option[Int]] = cache.buildLeagueIdCache()
+
 		// TODO -> everything is duplicated so it should probably be broken in functions
-		val homeTeam = teams
-			.map { ts =>
-				ts.filter { t =>
-					t.get("homeAway") == Some(ujson.Str("home"))
-				}.head
-			}.get // TODO -> do this safely
+		allTeams.map { teams =>
+			val homeTeam = teams
+				.filter { t => t.get("homeAway") == Some(ujson.Str("home")) }
+				.head
 
-		val awayTeam = teams
-			.map { ts =>
-				ts.filter { t =>
-					t.get("homeAway") == Some(ujson.Str("away"))
-				}.head 
-			}.get // TODO -> do this safely
+			val awayTeam = teams
+				.filter { t => t.get("homeAway") == Some(ujson.Str("away")) }
+				.head
 
-		val homeTeamId: Option[String] = homeTeam.get("school").map(h => s"${year.toString}-${h.str}")
-		val awayTeamId: Option[String] = awayTeam.get("school").map(a => s"${year.toString}-${a.str}")
-
-		val homeTeamDb: Option[Team] = db.getTeams(teamId = homeTeamId, limit = 1).headOption
-		val awayTeamDb: Option[Team] = db.getTeams(teamId = awayTeamId, limit = 1).headOption
-		
-		// This is clumsy but it will work?
-		Some(Game( // TODO -> Now that this func is returning Option, this is dumb
-			homeTeamId = homeTeamId,
-			awayTeamId = awayTeamId,
-			homeTeamLeagueId = homeTeamDb.flatMap(_.leagueId),
-			awayTeamLeagueId = awayTeamDb.flatMap(_.leagueId),
-			homeTeamPoints = homeTeam.get("points").map(_.num.toInt),
-			awayTeamPoints = awayTeam.get("points").map(_.num.toInt)
-		))
+			val homeTeamId: Option[String] = homeTeam.get("school").map(h => s"${year.toString}-${h.str}")
+			val awayTeamId: Option[String] = awayTeam.get("school").map(a => s"${year.toString}-${a.str}")
+			
+			// This is clumsy but it will work?
+			Game(
+				homeTeamId = homeTeamId,
+				awayTeamId = awayTeamId,
+				homeTeamLeagueId = leagueIdCache.get(homeTeamId.getOrElse("")).flatten,
+				awayTeamLeagueId = leagueIdCache.get(awayTeamId.getOrElse("")).flatten,
+				homeTeamPoints = homeTeam.get("points").map(_.num.toInt),
+				awayTeamPoints = awayTeam.get("points").map(_.num.toInt)
+			)
+		}
 	}
 
 
@@ -122,10 +119,8 @@ object Simulate {
 
 			// returning score for home team
 			case game.homeTeamId => {
-
 				// win @ home
 				if (hPoints > aPoints) {
-
 					scoreGame(
 						leagueIdOpt    = game.homeTeamLeagueId,
 						oppLeagueIdOpt = game.awayTeamLeagueId,
@@ -135,10 +130,8 @@ object Simulate {
 						scoreEqual     = (p: Int) => if (p > 14) 4 else  3,
 						scoreSuperior  = (p: Int) => if (p > 14) 5 else  4
 					)
-
 				// loss @ home
 				} else {
-
 					scoreGame(
 						leagueIdOpt    = game.homeTeamLeagueId,
 						oppLeagueIdOpt = game.awayTeamLeagueId,
@@ -148,16 +141,13 @@ object Simulate {
 						scoreEqual     = (pm: Int) => 0,
 						scoreSuperior  = (pm: Int) => if (pm > 14)  0 else  1
 					)
-
 				}
 			}
 
 			// returning score for away team
 			case game.awayTeamId => {
-
 				// win @ away
 				if (aPoints > hPoints) {
-
 					scoreGame(
 						leagueIdOpt    = game.awayTeamLeagueId,
 						oppLeagueIdOpt = game.homeTeamLeagueId,
@@ -167,10 +157,8 @@ object Simulate {
 						scoreEqual     = (pm: Int) => if (pm > 14) 5 else  4,
 						scoreSuperior  = (pm: Int) => if (pm > 14) 7 else  6
 					)
-
 				// loss @ away
 				} else {
-
 					scoreGame(
 						leagueIdOpt    = game.awayTeamLeagueId,
 						oppLeagueIdOpt = game.homeTeamLeagueId,
@@ -180,7 +168,6 @@ object Simulate {
 						scoreEqual     = (p: Int) => if (p > 14)  0 else  1,
 						scoreSuperior  = (p: Int) => if (p > 14)  1 else  2
 					)
-
 				}
 			}
 
@@ -233,40 +220,30 @@ object Simulate {
 		val weeks: Seq[Int] = (1 to maxWeek).toSeq
 
 		leagues.map { league => 
+			println(s"=> Simulating league '${league.name}' for year $year")
 
-			println(s"Simulating league '${league.name}' for year $year")
+			val updatedTeams: Seq[Team] = league.teams.map { team =>
+				println(s"=> ${team.name}")
 
-			val updatedTeams: Seq[Team] = league.teams.map { team => 
+				// get all games for the given team for the given year
+				val games: Seq[Game] = getGames(
+					teamName = team.name, 
+					year     = year
+				)
 
-				// for each week
-				weeks.foldLeft((team)) { (t, week) =>
-
-					// get game
-					val gameOpt: Option[Game] = getGame(
-						teamName = t.name, 
-						year     = year, 
-						week     = week
+				// get league points for all games
+				val seasonPoints: Int = games.foldLeft(0) { (points, game) =>
+					val p: Int = getPoints(
+						teamId = team.teamId,
+						game   = game
 					)
 
-					println(gameOpt)
-
-					gameOpt match {
-						case None => t
-						case Some(game) => {
-							// get points for game
-							// TODO -> this should return win/loss/draw as well
-							val points: Int = getPoints(
-								teamId = t.teamId, 
-								game   = game
-							)
-
-							println(points)
-
-							// update team points
-							t.copy(points = t.points + points)	
-						}
-					}
+					println(s"=> ${game.awayTeamId.getOrElse("None")} @ ${game.homeTeamId.getOrElse("None")} :: $p")
+					points + p
 				}
+
+				println(s"=> Final points: $seasonPoints\n")
+				team.copy(points = seasonPoints)
 			}
 
 			league.copy(teams = updatedTeams)

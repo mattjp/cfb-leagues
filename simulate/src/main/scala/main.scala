@@ -5,8 +5,8 @@ import types.{Game, League, Team}
 
 object Main extends App {
 
-	val startYear = 2006 // update how this is set
-	val endYear = 2006 // update how this is set
+	val startYear = 2007 // update how this is set
+	val endYear = 2019 // update how this is set
 	val leagueSize = 10
 	val n = 3
 
